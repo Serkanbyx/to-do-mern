@@ -5,6 +5,7 @@ const {
   createTodo,
   updateTodo,
   deleteTodo,
+  clearCompleted,
 } = require("../controllers/todoController");
 
 const router = express.Router();
@@ -14,6 +15,7 @@ router.use(verifyToken);
 
 router.get("/", getTodos);
 router.post("/", createTodo);
+router.delete("/completed", clearCompleted);
 router.put("/:id", updateTodo);
 router.delete("/:id", deleteTodo);
 

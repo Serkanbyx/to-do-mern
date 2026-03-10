@@ -1,10 +1,13 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import axiosInstance from "../api/axiosInstance";
 
-const TodoItem = ({ todo, onToggle, onDelete }) => {
+const TodoItem = ({ todo, onToggle, onDelete, onEdit }) => {
   const [isToggling, setIsToggling] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(todo.title);
+  const inputRef = useRef(null);
 
   const handleToggle = useCallback(async () => {
     setIsToggling(true);
@@ -33,6 +36,52 @@ const TodoItem = ({ todo, onToggle, onDelete }) => {
     }
   }, [todo._id, onDelete]);
 
+  const startEditing = useCallback(() => {
+    if (todo.completed) return;
+    setEditTitle(todo.title);
+    setIsEditing(true);
+    setTimeout(() => inputRef.current?.focus(), 0);
+  }, [todo.completed, todo.title]);
+
+  const saveEdit = useCallback(async () => {
+    const trimmed = editTitle.trim();
+    if (!trimmed) {
+      setEditTitle(todo.title);
+      setIsEditing(false);
+      return;
+    }
+    if (trimmed === todo.title) {
+      setIsEditing(false);
+      return;
+    }
+    try {
+      const { data } = await axiosInstance.put(`/todos/${todo._id}`, {
+        title: trimmed,
+      });
+      onEdit(data.data);
+      toast.success("Todo updated!");
+    } catch {
+      toast.error("Failed to update todo.");
+      setEditTitle(todo.title);
+    } finally {
+      setIsEditing(false);
+    }
+  }, [editTitle, todo._id, todo.title, onEdit]);
+
+  const handleEditKeyDown = useCallback(
+    (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        saveEdit();
+      }
+      if (e.key === "Escape") {
+        setEditTitle(todo.title);
+        setIsEditing(false);
+      }
+    },
+    [saveEdit, todo.title],
+  );
+
   return (
     <li
       className={`group flex items-center gap-3 rounded-xl border px-4 py-3 transition
@@ -58,12 +107,30 @@ const TodoItem = ({ todo, onToggle, onDelete }) => {
         )}
       </button>
 
-      <span
-        className={`flex-1 text-sm transition
-          ${todo.completed ? "text-gray-400 line-through" : "text-gray-800"}`}
-      >
-        {todo.title}
-      </span>
+      {isEditing ? (
+        <input
+          ref={inputRef}
+          type="text"
+          value={editTitle}
+          onChange={(e) => setEditTitle(e.target.value)}
+          onBlur={saveEdit}
+          onKeyDown={handleEditKeyDown}
+          maxLength={200}
+          className="min-w-0 flex-1 rounded-lg border border-indigo-300 bg-white px-2 py-1 text-sm text-gray-800 outline-none ring-2 ring-indigo-500/20"
+        />
+      ) : (
+        <span
+          onDoubleClick={startEditing}
+          className={`flex-1 cursor-default text-sm transition select-none ${
+            todo.completed
+              ? "text-gray-400 line-through"
+              : "text-gray-800 hover:text-indigo-600"
+          }`}
+          title={todo.completed ? "" : "Double-click to edit"}
+        >
+          {todo.title}
+        </span>
+      )}
 
       <button
         type="button"

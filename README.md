@@ -18,6 +18,9 @@ A full-stack task management application built with the **MERN** stack (MongoDB,
 - **Responsive Design** — Mobile-friendly layout built with Tailwind CSS 4
 - **Security Hardened** — Helmet, rate limiting, CORS whitelist, input sanitization, HPP protection, and more
 - **401 Auto-Handling** — Axios interceptor automatically clears auth state and redirects on expired tokens
+- **Filter Tabs** — Switch between All, Active, and Completed views with tab-based filtering
+- **Inline Editing** — Double-click any todo title to edit it in place with Enter/Escape support
+- **Clear Completed** — Bulk-delete all completed todos with a single click
 
 ---
 
@@ -181,6 +184,7 @@ Every todo is linked to a `userId`. The backend filters todos by the authenticat
 | GET | `/api/todos` | Yes | Get all todos for user |
 | POST | `/api/todos` | Yes | Create a new todo |
 | PUT | `/api/todos/:id` | Yes | Update a todo |
+| DELETE | `/api/todos/completed` | Yes | Delete all completed todos |
 | DELETE | `/api/todos/:id` | Yes | Delete a todo |
 
 > **Auth** endpoints are rate-limited to **10 requests per 15 minutes**. Todo endpoints require a valid `Authorization: Bearer <token>` header.
@@ -313,6 +317,9 @@ This project is deployed using **Render** (backend) and **Netlify** (frontend).
 - ✅ Security hardening (Helmet, rate limit, sanitization)
 - ✅ Axios interceptor for 401 auto-logout
 - ✅ Memoized todo items for performance
+- ✅ Filter tabs (All / Active / Completed)
+- ✅ Inline todo editing (double-click to edit)
+- ✅ Clear completed bulk action
 
 ### Future Features
 
@@ -320,7 +327,7 @@ This project is deployed using **Render** (backend) and **Netlify** (frontend).
 - [ ] 🔮 Drag-and-drop todo reordering
 - [ ] 🔮 Todo categories and labels
 - [ ] 🔮 Due dates and reminders
-- [ ] 🔮 Search and filter todos
+- [ ] 🔮 Search todos by keyword
 - [ ] 🔮 User profile management
 
 ---

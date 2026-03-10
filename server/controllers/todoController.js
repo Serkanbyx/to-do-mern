@@ -123,4 +123,26 @@ const deleteTodo = async (req, res, next) => {
   }
 };
 
-module.exports = { getTodos, createTodo, updateTodo, deleteTodo };
+/**
+ * @desc    Delete all completed todos for the authenticated user
+ * @route   DELETE /api/todos/completed
+ * @access  Private
+ */
+const clearCompleted = async (req, res, next) => {
+  try {
+    const result = await Todo.deleteMany({
+      userId: req.user.userId,
+      completed: true,
+    });
+
+    res.json({
+      success: true,
+      message: `${result.deletedCount} completed todo(s) deleted`,
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getTodos, createTodo, updateTodo, deleteTodo, clearCompleted };
