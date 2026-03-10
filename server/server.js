@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const hpp = require("hpp");
-const mongoSanitize = require("express-mongo-sanitize");
 require("dotenv").config();
 
 const connectDB = require("./config/db");
@@ -36,11 +35,29 @@ app.use(
   })
 );
 app.use(hpp());
-app.use(mongoSanitize());
 
 // ── Body Parsers ────────────────────────────────────────────────────
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+
+// Express 5 compatible MongoDB query injection prevention
+// (express-mongo-sanitize is incompatible with Express 5's getter-only req.query)
+app.use((req, _res, next) => {
+  const sanitize = (obj) => {
+    if (!obj || typeof obj !== "object") return obj;
+    for (const key of Object.keys(obj)) {
+      if (key.startsWith("$") || key.includes(".")) {
+        delete obj[key];
+      } else if (typeof obj[key] === "object") {
+        sanitize(obj[key]);
+      }
+    }
+    return obj;
+  };
+  if (req.body) sanitize(req.body);
+  if (req.headers) sanitize(req.headers);
+  next();
+});
 
 // ── Routes ───────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
