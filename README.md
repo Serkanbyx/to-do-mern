@@ -29,16 +29,6 @@ A full-stack task management application built with the **MERN** stack (MongoDB,
 
 ---
 
-## Screenshots
-
-> Add your screenshots here after running the app.
-
-| Login | Register | Dashboard |
-| ----- | -------- | --------- |
-| ![Login](screenshots/login.png) | ![Register](screenshots/register.png) | ![Dashboard](screenshots/dashboard.png) |
-
----
-
 ## Getting Started
 
 ### Prerequisites
@@ -193,6 +183,43 @@ s4.1_To Do Mern/
 - **HPP Protection** — HTTP Parameter Pollution prevention
 - **Generic Error Messages** — No stack traces or sensitive info leaked in production
 - **Environment Variables** — All secrets stored in `.env` (git-ignored)
+
+---
+
+## Deployment
+
+This project is deployed using **Render** (backend) and **Netlify** (frontend).
+
+### Backend — Render
+
+1. Create a new **Web Service** on [Render](https://render.com)
+2. Connect your GitHub repository
+3. Configure:
+   - **Root Directory:** `server`
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+4. Add environment variables:
+   | Variable | Value |
+   | -------- | ----- |
+   | `MONGO_URI` | Your MongoDB Atlas connection string |
+   | `JWT_SECRET` | A strong random secret |
+   | `NODE_ENV` | `production` |
+   | `CLIENT_URL` | `https://your-app.netlify.app` |
+
+### Frontend — Netlify
+
+1. Create a new site on [Netlify](https://www.netlify.com)
+2. Connect your GitHub repository
+3. Configure:
+   - **Base Directory:** `client`
+   - **Build Command:** `npm run build`
+   - **Publish Directory:** `client/dist`
+4. Add environment variable:
+   | Variable | Value |
+   | -------- | ----- |
+   | `VITE_API_URL` | `https://your-app.onrender.com/api` |
+
+> **Important:** After deploying both services, update `CLIENT_URL` on Render with your actual Netlify URL, and `VITE_API_URL` on Netlify with your actual Render URL. Then redeploy both.
 
 ---
 
