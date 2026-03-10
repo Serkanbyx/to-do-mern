@@ -13,18 +13,12 @@ const { version } = require("./package.json");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ── Security Middleware ──────────────────────────────────────────────
-app.use(helmet());
-app.use(hpp());
-app.use(mongoSanitize());
-
 // ── CORS — only allow requests from the frontend origin ─────────────
 const allowedOrigins = [process.env.CLIENT_URL || "http://localhost:5173"];
 
 app.use(
   cors({
     origin(origin, callback) {
-      // Allow requests with no origin (mobile apps, Postman, curl)
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
@@ -33,6 +27,16 @@ app.use(
     credentials: true,
   })
 );
+
+// ── Security Middleware ──────────────────────────────────────────────
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+  })
+);
+app.use(hpp());
+app.use(mongoSanitize());
 
 // ── Body Parsers ────────────────────────────────────────────────────
 app.use(express.json({ limit: "10kb" }));
