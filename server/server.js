@@ -6,6 +6,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 require("dotenv").config();
 
 const connectDB = require("./config/db");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -34,6 +35,9 @@ app.use(
 // ── Body Parsers ────────────────────────────────────────────────────
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+
+// ── Routes ───────────────────────────────────────────────────────────
+app.use("/api/auth", authRoutes);
 
 // ── Health Check ────────────────────────────────────────────────────
 app.get("/", (_req, res) => {
