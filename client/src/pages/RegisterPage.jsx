@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
+import Spinner from "../components/Spinner";
 
 const INITIAL_FORM = { name: "", email: "", password: "" };
 
@@ -42,6 +44,7 @@ const RegisterPage = () => {
 
     try {
       await register(formData.name.trim(), formData.email.trim(), formData.password);
+      toast.success("Account created successfully!");
       navigate("/", { replace: true });
     } catch (err) {
       const message =
@@ -171,8 +174,9 @@ const RegisterPage = () => {
           <button
             type="submit"
             disabled={!isFormValid || loading}
-            className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50 transition"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50 transition"
           >
+            {loading && <Spinner size="sm" className="border-white border-t-transparent" />}
             {loading ? "Creating account…" : "Create account"}
           </button>
 

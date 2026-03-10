@@ -1,6 +1,7 @@
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const { user, token, logout } = useAuth();
@@ -8,6 +9,7 @@ const Navbar = () => {
 
   const handleLogout = useCallback(() => {
     logout();
+    toast.success("Logged out successfully!");
     navigate("/login", { replace: true });
   }, [logout, navigate]);
 
@@ -20,8 +22,8 @@ const Navbar = () => {
           To-Do MERN
         </h1>
 
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <span className="max-w-[120px] truncate text-sm text-gray-600 sm:max-w-none">
             {user?.name}
           </span>
 

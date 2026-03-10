@@ -1,4 +1,5 @@
 import { memo, useCallback, useState } from "react";
+import toast from "react-hot-toast";
 import axiosInstance from "../api/axiosInstance";
 
 const TodoItem = ({ todo, onToggle, onDelete }) => {
@@ -12,8 +13,9 @@ const TodoItem = ({ todo, onToggle, onDelete }) => {
         completed: !todo.completed,
       });
       onToggle(data.data);
+      toast.success(data.data.completed ? "Marked as done!" : "Marked as undone!");
     } catch {
-      /* error handled by interceptor */
+      toast.error("Failed to update todo.");
     } finally {
       setIsToggling(false);
     }
@@ -24,7 +26,9 @@ const TodoItem = ({ todo, onToggle, onDelete }) => {
     try {
       await axiosInstance.delete(`/todos/${todo._id}`);
       onDelete(todo._id);
+      toast.success("Todo deleted!");
     } catch {
+      toast.error("Failed to delete todo.");
       setIsDeleting(false);
     }
   }, [todo._id, onDelete]);
@@ -66,7 +70,7 @@ const TodoItem = ({ todo, onToggle, onDelete }) => {
         aria-label="Delete todo"
         disabled={isDeleting}
         onClick={handleDelete}
-        className={`rounded-lg p-1.5 text-gray-400 opacity-0 transition hover:bg-red-50 hover:text-red-500 focus:opacity-100 group-hover:opacity-100
+        className={`rounded-lg p-1.5 text-gray-400 transition hover:bg-red-50 hover:text-red-500 sm:opacity-0 sm:group-hover:opacity-100 sm:focus:opacity-100
           ${isDeleting ? "opacity-50" : ""}`}
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
