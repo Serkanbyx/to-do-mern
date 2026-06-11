@@ -1,6 +1,5 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { validationResult } = require("express-validator");
 const User = require("../models/User");
 
 const SALT_ROUNDS = 12;
@@ -13,11 +12,6 @@ const JWT_EXPIRATION = "7d";
  */
 const register = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() });
-    }
-
     const { name, email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
@@ -56,11 +50,6 @@ const register = async (req, res, next) => {
  */
 const login = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() });
-    }
-
     const { email, password } = req.body;
 
     // +password: explicitly select the password field (excluded by default via select: false)

@@ -48,10 +48,10 @@ A full-stack task management application built with the **MERN** stack (MongoDB,
 - **MongoDB (Mongoose 9)**: NoSQL database with elegant object modeling
 - **JSON Web Tokens (JWT)**: Stateless authentication with 7-day token expiry
 - **bcryptjs**: Secure password hashing with 12 salt rounds
-- **express-validator**: Server-side input validation middleware
+- **express-validator**: Server-side input validation on all auth and todo endpoints
 - **Helmet**: Secure HTTP headers (XSS, clickjacking, MIME sniffing protection)
 - **express-rate-limit**: Rate limiting for auth endpoints (10 req/15 min)
-- **express-mongo-sanitize**: NoSQL injection prevention
+- **Custom NoSQL Sanitizer**: Express 5 compatible middleware stripping `$`/`.` keys to prevent injection
 - **HPP**: HTTP Parameter Pollution protection
 
 ---
@@ -206,11 +206,16 @@ s4.1_To Do Mern/
 │   │   │   ├── TodoItem.jsx        # Single todo row (memoized)
 │   │   │   └── TodoList.jsx        # Todo list + add form
 │   │   ├── context/
-│   │   │   └── AuthContext.jsx     # Auth state management
+│   │   │   ├── auth-context.js     # AuthContext object (shared)
+│   │   │   └── AuthContext.jsx     # AuthProvider component
+│   │   ├── hooks/
+│   │   │   └── useAuth.js          # useAuth consumer hook
 │   │   ├── pages/
 │   │   │   ├── HomePage.jsx        # Main todo dashboard
 │   │   │   ├── LoginPage.jsx       # Login form
 │   │   │   └── RegisterPage.jsx    # Register form
+│   │   ├── utils/
+│   │   │   └── token.js            # JWT expiry check + logout event
 │   │   ├── App.jsx                 # Root component + routing
 │   │   ├── main.jsx                # Entry point
 │   │   └── index.css               # Tailwind directives
@@ -226,6 +231,7 @@ s4.1_To Do Mern/
 │   │   ├── authController.js       # Register & login logic
 │   │   └── todoController.js       # Todo CRUD logic
 │   ├── middleware/
+│   │   ├── validate.js             # Shared validation result handler
 │   │   └── verifyToken.js          # JWT verification
 │   ├── models/
 │   │   ├── User.js                 # User schema
@@ -234,12 +240,24 @@ s4.1_To Do Mern/
 │   │   ├── authRoutes.js           # Auth endpoints
 │   │   └── todoRoutes.js           # Todo endpoints
 │   ├── validators/
-│   │   └── authValidator.js        # Input validation rules
+│   │   ├── authValidator.js        # Auth input validation rules
+│   │   └── todoValidator.js        # Todo input validation rules
 │   ├── .env.example
 │   ├── server.js                   # Express entry point
 │   └── package.json
 │
+├── .github/                        # GitHub community health files
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug_report.yml
+│   │   ├── feature_request.yml
+│   │   └── config.yml
+│   ├── CODE_OF_CONDUCT.md
+│   ├── CONTRIBUTING.md
+│   ├── SECURITY.md
+│   └── PULL_REQUEST_TEMPLATE.md
+│
 ├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
@@ -249,16 +267,17 @@ s4.1_To Do Mern/
 
 - **Helmet** — Secure HTTP headers protecting against XSS, clickjacking, and MIME sniffing
 - **Rate Limiting** — 10 requests per 15 minutes on authentication endpoints
+- **Trust Proxy** — Correct client IP resolution and rate limiting behind reverse proxies (Render/Netlify)
 - **CORS Whitelist** — Only the configured frontend origin is allowed
-- **Input Validation** — express-validator on all auth inputs with sanitization
+- **Input Validation** — express-validator on all auth and todo inputs with sanitization
 - **Password Hashing** — bcrypt with 12 salt rounds for secure storage
-- **JWT Expiration** — Tokens automatically expire after 7 days
+- **JWT Expiration** — Tokens automatically expire after 7 days, with client-side expiry checks
 - **Ownership Checks** — Users can only access and modify their own todos
-- **NoSQL Injection Prevention** — express-mongo-sanitize cleans all user inputs
+- **NoSQL Injection Prevention** — Custom Express 5 compatible sanitizer cleans all user inputs
 - **HPP Protection** — HTTP Parameter Pollution prevention middleware
 - **Body Size Limit** — 10kb maximum for JSON and URL-encoded payloads
 - **Generic Error Messages** — No stack traces or sensitive info leaked in production
-- **Environment Variables** — All secrets stored in `.env` files (git-ignored)
+- **Environment Variables** — All secrets stored in `.env` files (git-ignored), validated at startup (fail-fast)
 
 ---
 

@@ -25,16 +25,9 @@ const getTodos = async (req, res, next) => {
  */
 const createTodo = async (req, res, next) => {
   try {
-    const { title } = req.body;
-
-    if (!title || !title.trim()) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Title is required" });
-    }
-
+    // title is validated and trimmed by the createTodoRules middleware
     const todo = await Todo.create({
-      title: title.trim(),
+      title: req.body.title,
       userId: req.user.userId,
     });
 
@@ -73,9 +66,10 @@ const updateTodo = async (req, res, next) => {
         .json({ success: false, message: "Not authorized" });
     }
 
+    // title/completed are validated and normalized by updateTodoRules
     const { title, completed } = req.body;
 
-    if (title !== undefined) todo.title = title.trim();
+    if (title !== undefined) todo.title = title;
     if (completed !== undefined) todo.completed = completed;
 
     const updatedTodo = await todo.save();

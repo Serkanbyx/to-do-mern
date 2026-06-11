@@ -1,4 +1,4 @@
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import TodoList from "../components/TodoList";
 
 const HomePage = () => {

@@ -9,8 +9,22 @@ const authRoutes = require("./routes/authRoutes");
 const todoRoutes = require("./routes/todoRoutes");
 const { version } = require("./package.json");
 
+// ── Fail fast if critical environment variables are missing ─────────
+const REQUIRED_ENV = ["MONGO_URI", "JWT_SECRET"];
+const missingEnv = REQUIRED_ENV.filter((key) => !process.env[key]);
+if (missingEnv.length > 0) {
+  console.error(
+    `Missing required environment variables: ${missingEnv.join(", ")}`
+  );
+  process.exit(1);
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Trust the first proxy hop (Render, Netlify, etc.) so client IPs and
+// rate limiting work correctly behind a reverse proxy.
+app.set("trust proxy", 1);
 
 // ── CORS — only allow requests from the frontend origin ─────────────
 const allowedOrigins = [process.env.CLIENT_URL || "http://localhost:5173"];

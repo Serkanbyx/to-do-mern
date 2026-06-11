@@ -1,4 +1,5 @@
 import axios from "axios";
+import { AUTH_LOGOUT_EVENT } from "../utils/token";
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -21,10 +22,13 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Only treat 401 as a session expiry for authenticated requests.
+    // A 401 on login/register is an "invalid credentials" response and
+    // must be left for the page to handle, not trigger a logout.
+    if (error.response?.status === 401 && localStorage.getItem("token")) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+      window.dispatchEvent(new Event(AUTH_LOGOUT_EVENT));
     }
     return Promise.reject(error);
   },

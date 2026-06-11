@@ -1,7 +1,7 @@
-import { createContext, useContext, useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import axiosInstance from "../api/axiosInstance";
-
-const AuthContext = createContext(null);
+import { AUTH_LOGOUT_EVENT, isTokenExpired } from "../utils/token";
+import { AuthContext } from "./auth-context";
 
 const getStoredUser = () => {
   try {
@@ -12,9 +12,20 @@ const getStoredUser = () => {
   }
 };
 
+// Reads a still-valid token from storage; clears stale auth data otherwise.
+const getValidStoredToken = () => {
+  const stored = localStorage.getItem("token");
+  if (isTokenExpired(stored)) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    return null;
+  }
+  return stored;
+};
+
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(getStoredUser);
-  const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [token, setToken] = useState(getValidStoredToken);
+  const [user, setUser] = useState(() => (token ? getStoredUser() : null));
 
   const persistAuth = useCallback((userData, jwtToken) => {
     localStorage.setItem("token", jwtToken);
@@ -55,18 +66,22 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   }, []);
 
+  // React to session-expiry events emitted by the Axios interceptor.
+  // Clearing state lets ProtectedRoute redirect via the router instead
+  // of forcing a full-page reload.
+  useEffect(() => {
+    const handleLogout = () => {
+      setToken(null);
+      setUser(null);
+    };
+    window.addEventListener(AUTH_LOGOUT_EVENT, handleLogout);
+    return () => window.removeEventListener(AUTH_LOGOUT_EVENT, handleLogout);
+  }, []);
+
   const value = useMemo(
     () => ({ user, token, login, register, logout }),
     [user, token, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
 };
