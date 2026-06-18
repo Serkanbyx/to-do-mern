@@ -30,6 +30,28 @@ A full-stack task management application built with the **MERN** stack (MongoDB,
 
 ---
 
+## Screenshots
+
+### Dashboard
+
+The main task dashboard with filter tabs (All / Active / Completed), a live completed counter, inline-editable todos, and a bulk "Clear completed" action.
+
+![Todo dashboard with active and completed tasks](docs/screenshots/dashboard.png)
+
+### Login
+
+Secure sign-in screen with client-side validation and clear error feedback.
+
+![Login page](docs/screenshots/login.png)
+
+### Register
+
+Account creation form with per-field validation for name, email, and password.
+
+![Register page](docs/screenshots/register.png)
+
+---
+
 ## Technologies
 
 ### Frontend
@@ -255,6 +277,10 @@ s4.1_To Do Mern/
 │   ├── CONTRIBUTING.md
 │   ├── SECURITY.md
 │   └── PULL_REQUEST_TEMPLATE.md
+│
+├── docs/                           # Project documentation
+│   ├── screenshots/                # README screenshots
+│   └── build-guide.md              # Step-by-step build playbook
 │
 ├── .gitignore
 ├── LICENSE
